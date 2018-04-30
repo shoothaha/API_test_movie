@@ -26,8 +26,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 // Route::post('movie', 'MovieController@store');
 // //update:
 // Route::put('movie', 'MovieController@store');
-// //delete:
-// Route::delete('movie/{id}', 'MovieController@destroy');
+
 Route::group(['prefix' => 'v1'],function(){
     Route::apiResource('movies', 'MovieController');
+    //delete:
+    //(not sure why delete request from Route::resource() goes to an err )
+    Route::delete('/movies/{id}', 'MovieController@destroy');
 });

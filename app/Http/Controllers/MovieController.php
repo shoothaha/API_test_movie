@@ -7,6 +7,7 @@ use App\Http\Requests;
 use App\Movie;
 use App\Http\Resources\MovieResource;
 use App\Http\Requests\MovieRequest;
+use DB;
 
 class MovieController extends Controller
 {
@@ -17,7 +18,7 @@ class MovieController extends Controller
      */
     public function index()
     {
-        $movies = Movie::orderby('name')->paginate(15);
+        $movies = Movie::orderby('name')->paginate(6);
         return MovieResource::collection($movies);
     }
 
@@ -39,16 +40,26 @@ class MovieController extends Controller
      */
     public function store(MovieRequest $request)
     {
-        $movie = new Movie();
-        $movie->name = $request->name;
-        $movie->description = $request->description;
-        $movie->genre = $request->genre;
-        $movie->release_date = $request->release_date;
-        $movie->director = $request->director;
-        $movie->running_time =$request->running_time;
-        $movie->rating = $request->rating;
+        $success = true;
+        DB::beginTransaction();
+        try {
+            $movie = new Movie();
+            $movie->name = $request->name;
+            $movie->description = $request->description;
+            $movie->genre = $request->genre;
+            $movie->release_date = $request->release_date;
+            $movie->director = $request->director;
+            $movie->running_time =$request->running_time;
+            $movie->rating = $request->rating;
 
-        if ($movie->save()){
+            DB::commit();
+
+        } catch (\Exception $e){
+            DB::rollback();
+            $success = false;
+        }
+
+        if ($success){
             return new MovieResource($movie);
         };
     }
@@ -86,16 +97,25 @@ class MovieController extends Controller
     public function update(MovieRequest $request, $id)
     {
         $movie = Movie::findOrFail($id);
+        $success = true;
+        DB::beginTransaction();
+        try {
+            $movie->name = $request->name;
+            $movie->description = $request->description;
+            $movie->genre = $request->genre;
+            $movie->release_date = $request->release_date;
+            $movie->director = $request->director;
+            $movie->running_time =$request->running_time;
+            $movie->rating = $request->rating;
 
-        $movie->name = $request->name;
-        $movie->description = $request->description;
-        $movie->genre = $request->genre;
-        $movie->release_date = $request->release_date;
-        $movie->director = $request->director;
-        $movie->running_time =$request->running_time;
-        $movie->rating = $request->rating;
+            DB::commit();
 
-        if($movie->save()){
+        } catch (\Exception $e){
+            DB::roolback();
+            $success = false;
+        }
+
+        if($success){
             return new MovieResource($movie);
         };
     }
@@ -110,10 +130,9 @@ class MovieController extends Controller
     {
         $movie = Movie::findOrFail($id);
         
-        if ($movie->delete()){
-            // Session::flash('success', 'You have successfully deleted the movie!');
+        if ($movie->delete()){            
             $movies = Movie::orderby('name')->paginate(15);
             return MovieResource::collection($movies);
-        };
+        }
     }
 }
