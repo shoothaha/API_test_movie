@@ -60,6 +60,7 @@ class MovieController extends Controller
         }
 
         if ($success){
+            $movie->save();
             return new MovieResource($movie);
         };
     }
@@ -116,6 +117,7 @@ class MovieController extends Controller
         }
 
         if($success){
+            $movie->save();
             return new MovieResource($movie);
         };
     }

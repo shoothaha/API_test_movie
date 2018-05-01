@@ -24,6 +24,8 @@
                 <movies></movies>
                 
             </div>
+            <hr>
+            
        </div>
 
        <hr>

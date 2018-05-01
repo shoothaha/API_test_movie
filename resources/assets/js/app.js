@@ -17,6 +17,7 @@ window.Vue = require('vue');
 
 Vue.component('movies', require('./components/Movies.vue'));
 Vue.component('navbar', require('./components/Navbar.vue'));
+Vue.component('create', require('./components/Create.vue'));
 
 
 const app = new Vue({

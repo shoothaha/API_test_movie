@@ -33,6 +33,7 @@
             </div>
             <hr>
             <!-- delete & edit buttons: -->
+            <button @click="editMovie(movie)" class="btn btn-primary mb-2">Edit Movie</button>
             <button @click="deleteMovie(movie.id)" class="btn btn-danger">Delete Movie</button>
         </div>
 
@@ -53,16 +54,49 @@
             </ul>
         </nav>
         <hr>
-        <form @submit.prevent="addMovie" class="mb-2">
-            <div class="form-group">
-                <input type="text" class="form-control" placeholder="Movie Title" v-model="movie.name">
+
+        <!-- edit and update form -->
+        <h2>Modify Movie:</h2>
+        <form @submit.prevent="addMovie">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="inputTitle">Movie Name:</label>
+                <input type="text" class="form-control" id="inputTitle" placeholder="Title" v-model="movie.name">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="inputDate">Released Date:</label>
+                <input type="date" class="form-control" id="inputDate" placeholder="Released Date" v-model="movie.release_date">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputDescription">Description</label>
+            <input type="textarea" class="form-control" id="inputDescription" placeholder="Description" v-model="movie.description">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="inputDirector">Director Name:</label>
+                <input type="text" class="form-control" id="inputDirector" v-model="movie.director">
+            </div>
+            
+            <div class="form-group col-md-3">
+                <label for="inputGenre">Genre:</label>
+                <input type="text" class="form-control" id="inputGenre" v-model="movie.genre">
             </div>
 
-            <div class="form-group">
-                <input type="textarea" class="form-control" placeholder="Movie Description" v-model="movie.description">
+            <div class="form-group col-md-3">
+                <label for="inputRunningTime">Running Time:</label>
+                <input type="text" class="form-control" placeholder="Movie Length (min)" v-model="movie.running_time">
             </div>
-            <button type="submit" class="btn btn-submit">Save</button>
-        </form>
+            
+            <div class="form-group col-md-3">
+                <label for="inputRating">Rating:</label>
+                <input type="text" class="form-control" id="inputRating" v-model="movie.rating">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Save</button>
+    </form>
     </div>
     
 </template>
@@ -70,7 +104,9 @@
 
 
 <script>
+    
     export default {
+        
         // get data:
         data() {
             return {
@@ -147,19 +183,62 @@
                         method: 'post',
                         body: JSON.stringify(this.movie),
                         headers: {
-                            'accept': 'application/json',
-                            'content-type': 'application/x-www-form-urlencoded'
+                            
+                            'content-type': 'application/json'
                         }
                     })
+                    // .then(console.log(this.movie))
                     .then(res => res.json())
                     .then(data => {
                         this.movie.name = '';
                         this.movie.description = '';
+                        this.movie.genre = '';
+                        this.movie.release_date = '';
+                        this.movie.director = '';
+                        this.movie.running_time = '';
+                        this.movie.rating = '';
+                        alert('Movie Added!')
+                        this.fetchMovies()
                     })
+                    .catch(error => console.log(error))
                 } else {
-                    a
+                    fetch('api/v1/movies/' + this.movie.id, {
+                        method: 'put',
+                        body: JSON.stringify(this.movie),
+                        headers: {
+                            
+                            'content-type': 'application/json'
+                        }
+                    })
+                    // .then(console.log(this.movie))
+                    .then(res => res.json())
+                    .then(data => {
+                        this.movie.name = '';
+                        this.movie.description = '';
+                        this.movie.genre = '';
+                        this.movie.release_date = '';
+                        this.movie.director = '';
+                        this.movie.running_time = '';
+                        this.movie.rating = '';
+                        alert('Movie Changed!')
+                        this.fetchMovies()
+                    })
                 }
+            },
+
+            editMovie (movie) {
+                this.edit = true;
+                this.movie.id = movie.id;
+                this.movie.movie_id = movie.id;
+                this.movie.name = movie.name;
+                this.movie.description = movie.description;
+                this.movie.genre = movie.genre;
+                this.movie.release_date = movie.release_date;
+                this.movie.director = movie.director;
+                this.movie.running_time = movie.running_time;
+                this.movie.rating = movie.rating
             }
+            
         }        
     }
 </script>
